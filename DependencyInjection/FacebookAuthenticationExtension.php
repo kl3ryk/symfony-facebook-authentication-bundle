@@ -2,18 +2,28 @@
 
 namespace Laelaps\Bundle\FacebookAuthentication\DependencyInjection;
 
+use Laelaps\Bundle\Facebook\FacebookExtensionInterface;
+use Laelaps\Bundle\Facebook\FacebookExtensionTrait;
+use Laelaps\Bundle\FacebookAuthentication\Exception\MissingBundleDependency;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class FacebookAuthenticationExtension extends Extension
+/**
+ * Facebook container extension.
+ *
+ * @author Mateusz Charytoniuk <mateusz.charytoniuk@gmail.com>
+ */
+class FacebookAuthenticationExtension extends Extension implements FacebookExtensionInterface
 {
+    use FacebookExtensionTrait;
+
     /**
      * @var string
      */
-    const CONTAINER_SERVICE_ID_FACEBOOK_SDK_ADAPTER = 'laelaps.facebook_authentication.facebook_sdk_adapter';
+    const CONTAINER_DEFAULT_SERVICE_ALIAS_FACEBOOK_LOCAL_SDK_ADAPTER = 'facebook';
 
     /**
      * @var string
@@ -39,10 +49,14 @@ class FacebookAuthenticationExtension extends Extension
      * @param array $configs
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      * @return void
-     * @throws \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @throws \Laelaps\Bundle\FacebookAuthentication\Exception\MissingBundleDependency
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        var_dump($configs);
+
+        $registeredBundles = $container->getParameter('kernel.bundles');
+
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.php');
     }

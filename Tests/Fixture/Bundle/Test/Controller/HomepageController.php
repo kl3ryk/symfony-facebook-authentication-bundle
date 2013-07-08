@@ -1,6 +1,6 @@
 <?php
 
-namespace Laelaps\Bundle\FacebookAuthentication\Tests\Bundle\Test\Controller;
+namespace Laelaps\Bundle\FacebookAuthentication\Tests\Fixture\Bundle\Test\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;

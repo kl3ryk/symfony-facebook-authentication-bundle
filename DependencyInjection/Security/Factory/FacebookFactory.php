@@ -2,19 +2,42 @@
 
 namespace Laelaps\Bundle\FacebookAuthentication\DependencyInjection\Security\Factory;
 
+use Laelaps\Bundle\Facebook\Configuration\FacebookAdapter as FacebookAdapterConfiguration;
+use Laelaps\Bundle\Facebook\Configuration\FacebookApplication as FacebookApplicationConfiguration;
 use Laelaps\Bundle\FacebookAuthentication\DependencyInjection\FacebookAuthenticationExtension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Facebook security authentication listener.
+ *
+ * @author Mateusz Charytoniuk <mateusz.charytoniuk@gmail.com>
+ */
 class FacebookFactory implements SecurityFactoryInterface
 {
     /**
      * @var string
      */
     const FACTORY_KEY = 'facebook';
+
+    /**
+     * @var \Laelaps\Bundle\Facebook\Configuration\FacebookAdapter
+     */
+    private $facebookAdapterConfiguration;
+
+    /**
+     * @var \Laelaps\Bundle\Facebook\Configuration\FacebookApplication
+     */
+    private $facebookApplicationConfiguration;
+
+    public function __construct()
+    {
+        $this->facebookAdapterConfiguration = new FacebookAdapterConfiguration;
+        $this->facebookApplicationConfiguration = new FacebookApplicationConfiguration;
+    }
 
     /**
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
@@ -168,10 +191,24 @@ class FacebookFactory implements SecurityFactoryInterface
      */
     public function addConfiguration(NodeDefinition $node)
     {
+        $this->facebookApplicationConfiguration
+            ->addFacebookApplicationSection($node)
+        ;
+
+        // now overwrite some parameters to be optional
         $node
             ->children()
-                ->scalarNode('lifetime')->defaultValue(300)
+                ->scalarNode(FacebookApplicationConfiguration::CONFIG_NODE_NAME_APPLICATION_ID)
+                    ->defaultValue(null)
+                ->end()
+                ->scalarNode(FacebookApplicationConfiguration::CONFIG_NODE_NAME_SECRET)
+                    ->defaultValue(null)
+                ->end()
             ->end()
+        ;
+
+        $this->facebookAdapterConfiguration
+            ->addFacebookAdapterSection($node)
         ;
     }
 }

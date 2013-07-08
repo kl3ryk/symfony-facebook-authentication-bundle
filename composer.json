@@ -10,14 +10,21 @@
             "Laelaps\\Bundle\\FacebookAuthentication": ""
         }
     },
+    "description": "This package provides Symfony2 bundle for Facebok authentication.",
+    "keywords": ["authentication", "facebook", "symfony"],
     "license": "MIT",
     "minimum-stability": "stable",
     "name": "laelaps/symfony-facebook-authentication-bundle",
     "require": {
         "ext-curl": "*",
         "facebook/php-sdk": "~3.2,>=3.2.2",
+        "laelaps/symfony-facebook-bundle": "~1.0",
         "php": ">=5.4",
-        "symfony/security-bundle": "~2.3"
+        "symfony/config": "~2.2",
+        "symfony/dependency-injection": "~2.2",
+        "symfony/http-foundation": "~2.2",
+        "symfony/http-kernel": "~2.2",
+        "symfony/security-bundle": "~2.2"
     },
     "require-dev": {
         "absolvent/phpunit-symfony": "~2.4,>=2.4.3",

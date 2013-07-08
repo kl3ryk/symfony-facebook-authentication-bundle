@@ -6,16 +6,22 @@ use Absolvent\PHPUnitSymfony\KernelTestCase as BaseKernelTestCase;
 
 class KernelTestCase extends BaseKernelTestCase
 {
+    /**
+     * {@inheritDoc}
+     */
     public function getKernelBundles()
     {
         return [
             new \Laelaps\Bundle\FacebookAuthentication\FacebookAuthenticationBundle,
-            new \Laelaps\Bundle\FacebookAuthentication\Tests\Bundle\Test\TestBundle,
+            new \Laelaps\Bundle\FacebookAuthentication\Tests\Fixture\Bundle\Test\TestBundle,
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle,
             new \Symfony\Bundle\SecurityBundle\SecurityBundle,
         ];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getKernelConfiguration()
     {
         $config = parent::getKernelConfiguration();
@@ -27,6 +33,9 @@ class KernelTestCase extends BaseKernelTestCase
         return $config;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getKernelConfigurationFiles()
     {
         $response = array_merge(

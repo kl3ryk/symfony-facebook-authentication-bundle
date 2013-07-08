@@ -12,15 +12,19 @@ use Acme\DemoBundle\Security\Authentication\Token\WsseUserToken;
 
 class FacebookListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
+    /**
+     * @var \Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface
+     */
+    private $authenticationManager;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager)
-    {
-        $this->securityContext = $securityContext;
-        $this->authenticationManager = $authenticationManager;
-    }
+    /**
+     * @var \Symfony\Component\Security\Core\SecurityContextInterface
+     */
+    private $securityContext;
 
+    /**
+     * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+     */
     public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
