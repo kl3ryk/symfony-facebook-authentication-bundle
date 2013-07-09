@@ -6,6 +6,7 @@ use BadMethodCallException;
 use InvalidArgumentException;
 use Laelaps\Bundle\Facebook\Configuration\FacebookAdapter as FacebookAdapterConfiguration;
 use Laelaps\Bundle\Facebook\Configuration\FacebookApplication as FacebookApplicationConfiguration;
+use Laelaps\Bundle\Facebook\DependencyInjection\FacebookExtension;
 use Laelaps\Bundle\FacebookAuthentication\DependencyInjection\FacebookAuthenticationExtension;
 use SplObserver;
 use SplSubject;
@@ -26,6 +27,11 @@ class FacebookFactory implements SecurityFactoryInterface, SplObserver
      * @var string
      */
     const FACTORY_KEY = 'facebook';
+
+    /**
+     * @var \Laelaps\Bundle\Facebook\DependencyInjection\FacebookExtension
+     */
+    private $facebookExtension;
 
     /**
      * @param \Symfony\Component\Config\Definition\Builder\NodeDefinition $node
@@ -50,7 +56,7 @@ class FacebookFactory implements SecurityFactoryInterface, SplObserver
             ->children()
                 ->scalarNode(FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS)
                     ->cannotBeEmpty()
-                    ->defaultValue($defaults[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS])
+                    ->defaultValue(null)
                 ->end()
                 ->scalarNode(FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SESSION_NAMESPACE)
                     ->cannotBeEmpty()
@@ -196,9 +202,18 @@ class FacebookFactory implements SecurityFactoryInterface, SplObserver
      * @param string $pointOfEntryId
      * @return string
      */
-    public function createFacebookSymfonyAdapter(ContainerBuilder $container, $providerKey, array $config, $userProviderId)
+    public function createFacebookAdapter(ContainerBuilder $container, $providerKey, array $config, $userProviderId)
     {
-        return __METHOD__;
+        if (isset($config[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS])) {
+            $facebookAdapterId = $config[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS];
+        }
+
+        var_dump(__METHOD__);
+        die;
+
+        $this->facebookExtension->createFacebookAdapterService($config, $facebookAdapterId, $container);
+
+        return $facebookAdapterId;
     }
 
     /**
@@ -236,6 +251,19 @@ class FacebookFactory implements SecurityFactoryInterface, SplObserver
     }
 
     /**
+     * @return \Laelaps\Bundle\Facebook\DependencyInjection\FacebookExtension $facebookExtension
+     * @throws \BadMethodCallException
+     */
+    public function getFacebookExtension(FacebookExtension $facebookExtension)
+    {
+        if (!($this->facebookExtension instanceof FacebookExtension)) {
+            throw new BadMethodCallException('Facebook extension is not set.');
+        }
+
+        return $this->facebookExtension;
+    }
+
+    /**
      * @return string
      */
     public function getPosition()
@@ -258,6 +286,15 @@ class FacebookFactory implements SecurityFactoryInterface, SplObserver
     public function setFacebookApplicationDefaultConfiguration(array $facebookApplicationDefaultConfiguration)
     {
         $this->facebookApplicationDefaultConfiguration = $facebookApplicationDefaultConfiguration;
+    }
+
+    /**
+     * @param \Laelaps\Bundle\Facebook\DependencyInjection\FacebookExtension $facebookExtension
+     * @return void
+     */
+    public function setFacebookExtension(FacebookExtension $facebookExtension)
+    {
+        $this->facebookExtension = $facebookExtension;
     }
 
     /**

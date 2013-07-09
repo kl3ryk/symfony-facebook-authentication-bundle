@@ -18,48 +18,19 @@ class FacebookAuthenticationBundle extends Bundle
     {
         parent::build($container);
 
-        $this->registerFacebookExtension($container);
-        $this->registerSecurityFactory($container);
-    }
-
-    /**
-     * @param \SplObserver $observer
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @return void
-     */
-    public function registerFacebookAuthenticationObserver(SplObserver $observer, ContainerBuilder $container)
-    {
-        $container->getExtension('facebook_authentication')
-            ->attach($observer)
-        ;
-    }
-
-    /**
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @return void
-     * @throws \LogicException
-     */
-    public function registerFacebookExtension(ContainerBuilder $container)
-    {
         if (!$container->hasExtension('facebook')) {
-            $container->registerExtension(new FacebookExtension);
+            $container->registerExtension($facebookExtension = new FacebookExtension);
         } else {
             $facebookExtension = $container->getExtension('facebook');
             if (!($facebookExtension instanceof FacebookExtension)) {
                 throw new LogicException(sprintf('"%s" bundle is colliding with "%s" extension. "%s" extension is recommended instead of the above.', get_class($this), get_class($facebookExtension), 'Laelaps\Bundle\Facebook\DependencyInjection\FacebookExtension'));
             }
         }
-    }
 
-    /**
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @return void
-     */
-    public function registerSecurityFactory(ContainerBuilder $container)
-    {
         $securityFactory = new FacebookFactory;
+        $securityFactory->setFacebookExtension($facebookExtension);
 
-        $this->registerFacebookAuthenticationObserver($securityFactory, $container);
+        $container->getExtension('facebook_authentication')->attach($securityFactory);
 
         $extension = $container->getExtension('security');
         $extension->addSecurityListenerFactory($securityFactory);

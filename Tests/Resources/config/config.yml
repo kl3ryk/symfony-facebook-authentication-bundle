@@ -4,4 +4,3 @@ imports:
 facebook:
     application_id: your_application_id
     secret: your_facebook_secret
-    permissions: [hello]
