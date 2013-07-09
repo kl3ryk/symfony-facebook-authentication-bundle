@@ -2,9 +2,13 @@
 
 namespace Laelaps\Bundle\FacebookAuthentication\DependencyInjection\Security\Factory;
 
+use BadMethodCallException;
+use InvalidArgumentException;
 use Laelaps\Bundle\Facebook\Configuration\FacebookAdapter as FacebookAdapterConfiguration;
 use Laelaps\Bundle\Facebook\Configuration\FacebookApplication as FacebookApplicationConfiguration;
 use Laelaps\Bundle\FacebookAuthentication\DependencyInjection\FacebookAuthenticationExtension;
+use SplObserver;
+use SplSubject;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -16,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Mateusz Charytoniuk <mateusz.charytoniuk@gmail.com>
  */
-class FacebookFactory implements SecurityFactoryInterface
+class FacebookFactory implements SecurityFactoryInterface, SplObserver
 {
     /**
      * @var string
@@ -24,19 +28,68 @@ class FacebookFactory implements SecurityFactoryInterface
     const FACTORY_KEY = 'facebook';
 
     /**
-     * @var \Laelaps\Bundle\Facebook\Configuration\FacebookAdapter
+     * @param \Symfony\Component\Config\Definition\Builder\NodeDefinition $node
+     * @return void
      */
-    private $facebookAdapterConfiguration;
+    public function addConfiguration(NodeDefinition $node)
+    {
+        $config = $this->getFacebookApplicationDefaultConfiguration();
+
+        $this->addFacebookAdapterConfigurationSection($config, $node);
+        $this->addFacebookApplicationConfigurationSection($config, $node);
+    }
 
     /**
-     * @var \Laelaps\Bundle\Facebook\Configuration\FacebookApplication
+     * @param array $defaults
+     * @param \Symfony\Component\Config\Definition\Builder\NodeDefinition $node
+     * @return void
      */
-    private $facebookApplicationConfiguration;
-
-    public function __construct()
+    public function addFacebookAdapterConfigurationSection(array & $defaults, NodeDefinition $node)
     {
-        $this->facebookAdapterConfiguration = new FacebookAdapterConfiguration;
-        $this->facebookApplicationConfiguration = new FacebookApplicationConfiguration;
+        $node
+            ->children()
+                ->scalarNode(FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS)
+                    ->cannotBeEmpty()
+                    ->defaultValue($defaults[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS])
+                ->end()
+                ->scalarNode(FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SESSION_NAMESPACE)
+                    ->cannotBeEmpty()
+                    ->defaultValue($defaults[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SESSION_NAMESPACE])
+                ->end()
+            ->end()
+        ;
+    }
+
+    /**
+     * @param array $defaults
+     * @param \Symfony\Component\Config\Definition\Builder\NodeDefinition $node
+     * @return void
+     */
+    public function addFacebookApplicationConfigurationSection(array & $defaults, NodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->scalarNode(FacebookApplicationConfiguration::CONFIG_NODE_NAME_APPLICATION_ID)
+                    ->cannotBeEmpty()
+                    ->defaultValue($defaults[FacebookApplicationConfiguration::CONFIG_NODE_NAME_APPLICATION_ID])
+                ->end()
+                ->booleanNode(FacebookApplicationConfiguration::CONFIG_NODE_NAME_FILE_UPLOAD)
+                    ->defaultValue($defaults[FacebookApplicationConfiguration::CONFIG_NODE_NAME_FILE_UPLOAD])
+                ->end()
+                ->arrayNode(FacebookApplicationConfiguration::CONFIG_NODE_NAME_PERMISSIONS)
+                    ->cannotBeEmpty()
+                    ->defaultValue($defaults[FacebookApplicationConfiguration::CONFIG_NODE_NAME_PERMISSIONS])
+                    ->prototype('scalar')->end()
+                ->end()
+                ->scalarNode(FacebookApplicationConfiguration::CONFIG_NODE_NAME_SECRET)
+                    ->cannotBeEmpty()
+                    ->defaultValue($defaults[FacebookApplicationConfiguration::CONFIG_NODE_NAME_SECRET])
+                ->end()
+                ->booleanNode(FacebookApplicationConfiguration::CONFIG_NODE_NAME_TRUST_PROXY_HEADERS)
+                    ->defaultValue($defaults[FacebookApplicationConfiguration::CONFIG_NODE_NAME_TRUST_PROXY_HEADERS])
+                ->end()
+            ->end()
+        ;
     }
 
     /**
@@ -170,6 +223,19 @@ class FacebookFactory implements SecurityFactoryInterface
     }
 
     /**
+     * @return array
+     * @throws \BadMethodCallException
+     */
+    public function getFacebookApplicationDefaultConfiguration()
+    {
+        if (!isset($this->facebookApplicationDefaultConfiguration)) {
+            throw new BadMethodCallException('Facebook application configuration is not set.');
+        }
+
+        return $this->facebookApplicationDefaultConfiguration;
+    }
+
+    /**
      * @return string
      */
     public function getPosition()
@@ -186,29 +252,24 @@ class FacebookFactory implements SecurityFactoryInterface
     }
 
     /**
-     * @param \Symfony\Component\Config\Definition\Builder\NodeDefinition $node
+     * @param array $facebookApplicationDefaultConfiguration
      * @return void
      */
-    public function addConfiguration(NodeDefinition $node)
+    public function setFacebookApplicationDefaultConfiguration(array $facebookApplicationDefaultConfiguration)
     {
-        $this->facebookApplicationConfiguration
-            ->addFacebookApplicationSection($node)
-        ;
+        $this->facebookApplicationDefaultConfiguration = $facebookApplicationDefaultConfiguration;
+    }
 
-        // now overwrite some parameters to be optional
-        $node
-            ->children()
-                ->scalarNode(FacebookApplicationConfiguration::CONFIG_NODE_NAME_APPLICATION_ID)
-                    ->defaultValue(null)
-                ->end()
-                ->scalarNode(FacebookApplicationConfiguration::CONFIG_NODE_NAME_SECRET)
-                    ->defaultValue(null)
-                ->end()
-            ->end()
-        ;
+    /**
+     * @param \SplSubject $subject
+     * @throws \InvalidArgumentException
+     */
+    public function update(SplSubject $subject)
+    {
+        if (!($subject instanceof FacebookAuthenticationExtension)) {
+            throw new InvalidArgumentException(sprintf('Observer subject is expected to be an instance of "FacebookAuthenticationExtension", "%s" given.', get_class($subject)));
+        }
 
-        $this->facebookAdapterConfiguration
-            ->addFacebookAdapterSection($node)
-        ;
+        $this->setFacebookApplicationDefaultConfiguration($subject->getFacebookApplicationConfiguration());
     }
 }
