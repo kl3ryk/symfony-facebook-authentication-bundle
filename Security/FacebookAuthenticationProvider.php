@@ -2,7 +2,7 @@
 
 namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
-use Laelaps\Bundle\FacebookAuthentication\Security\Authentication\Token\WsseUserToken;
+use Laelaps\Bundle\Facebook\FacebookAdapter;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -11,59 +11,54 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class FacebookAuthenticationProvider implements AuthenticationProviderInterface
 {
+    /**
+     * @param \Symfony\Component\Security\Core\User\UserProviderInterface
+     */
     private $userProvider;
-    private $cacheDir;
 
-    public function __construct(UserProviderInterface $userProvider, $cacheDir)
-    {
-        $this->userProvider = $userProvider;
-        $this->cacheDir     = $cacheDir;
-    }
-
+    /**
+     * @param \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token
+     * @return bool
+     */
     public function authenticate(TokenInterface $token)
     {
         $user = $this->userProvider->loadUserByUsername($token->getUsername());
 
-        if ($user && $this->validateDigest($token->digest, $token->nonce, $token->created, $user->getPassword())) {
-            $authenticatedToken = new WsseUserToken($user->getRoles());
-            $authenticatedToken->setUser($user);
-
-            return $authenticatedToken;
+        if (!$user) {
+            return $this->notifyAuthenticationFailure($token);
         }
 
-        throw new AuthenticationException('The WSSE authentication failed.');
+        $authenticatedToken = new FacebookUserToken($user, $user->getRoles());
+
+        $this->notifyAuthenticationSuccess($authenticatedToken);
+
+        return $authenticatedToken;
     }
 
-    protected function validateDigest($digest, $nonce, $created, $secret)
+    /**
+     * @param \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token
+     * @return bool
+     * @throws \Symfony\Component\Security\Core\Exception\AuthenticationException
+     */
+    public function notifyAuthenticationFailure(TokenInterface $token)
     {
-        // Check created time is not in the future
-        if (strtotime($created) > time()) {
-            return false;
-        }
-
-        // Expire timestamp after 5 minutes
-        if (time() - strtotime($created) > 300) {
-            return false;
-        }
-
-        // Validate nonce is unique within 5 minutes
-        if (file_exists($this->cacheDir.'/'.$nonce) && file_get_contents($this->cacheDir.'/'.$nonce) + 300 > time()) {
-            throw new NonceExpiredException('Previously used nonce detected');
-        }
-        // If cache directory does not exist we create it
-        if (!is_dir($this->cacheDir)) {
-            mkdir($this->cacheDir, 0777, true);
-        }
-        file_put_contents($this->cacheDir.'/'.$nonce, time());
-
-        // Validate Secret
-        $expected = base64_encode(sha1(base64_decode($nonce).$created.$secret, true));
-
-        return $digest === $expected;
+        throw new AuthenticationException('Facebook authentication failed');
     }
 
+    /**
+     * @param \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token
+     * @return bool
+     */
+    public function notifyAuthenticationSuccess(TokenInterface $token)
+    {
+    }
+
+    /**
+     * @param \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token
+     * @return bool
+     */
     public function supports(TokenInterface $token)
     {
-        return $token instanceof WsseUserToken;
+        return $token instanceof FacebookUserToken;
     }
 }
