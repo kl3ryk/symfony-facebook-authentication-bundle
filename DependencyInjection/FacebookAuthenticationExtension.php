@@ -33,22 +33,22 @@ class FacebookAuthenticationExtension extends Extension implements FacebookExten
     /**
      * @var string
      */
-    const CONTAINER_SERVICE_ID_SECURITY_AUTHENTICATION_PROVIDER = 'laelaps.facebook_authentication.security_authentication_provider';
+    const CONTAINER_SERVICE_ID_SECURITY_AUTHENTICATION_PROVIDER = 'laelaps.security.facebook.authentication_provider';
 
     /**
      * @var string
      */
-    const CONTAINER_SERVICE_ID_SECURITY_ENTRY_POINT = 'laelaps.facebook_authentication.security_entry_point';
+    const CONTAINER_SERVICE_ID_SECURITY_ENTRY_POINT = 'laelaps.security.facebook.entry_point';
 
     /**
      * @var string
      */
-    const CONTAINER_SERVICE_ID_SECURITY_FIREWALL_LISTENER = 'laelaps.facebook_authentication.security_firewall_listener';
+    const CONTAINER_SERVICE_ID_SECURITY_FIREWALL_LISTENER = 'laelaps.security.facebook.firewall_listener';
 
     /**
      * @var string
      */
-    const CONTAINER_SERVICE_ID_SECURITY_USER_PROVIDER = 'laelaps.facebook_authentication.security_user_provider';
+    const CONTAINER_SERVICE_ID_SECURITY_USER_PROVIDER = 'laelaps.security.facebook.user_provider';
 
     /**
      * @var array
@@ -72,11 +72,16 @@ class FacebookAuthenticationExtension extends Extension implements FacebookExten
      */
     public function attach(SplObserver $observer)
     {
-        if (isset($this->observers[$observer])) {
+        if ($this->observers->contains($observer)) {
             throw new OverflowException(sprintf('Given observer is already attached: "%s"', get_class($observer)));
         }
 
         $this->observers->attach($observer);
+
+        if ($this->hasFacebookApplicationConfiguration()) {
+            // update observer instantly if configuration is set
+            $observer->update($this);
+        }
     }
 
     /**
@@ -86,7 +91,7 @@ class FacebookAuthenticationExtension extends Extension implements FacebookExten
      */
     public function detach(SplObserver $observer)
     {
-        if (!isset($this->observers[$observer])) {
+        if (!$this->observers->contains($observer)) {
             throw new UnderflowException(sprintf('Given observer is not on the observers list: "%s"', get_class($observer)));
         }
 
@@ -114,6 +119,14 @@ class FacebookAuthenticationExtension extends Extension implements FacebookExten
     public function getFacebookApplicationConfigurationOnly(ContainerBuilder $container)
     {
         return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasFacebookApplicationConfiguration()
+    {
+        return isset($this->facebookApplicationConfiguration);
     }
 
     /**
