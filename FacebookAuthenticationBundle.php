@@ -3,9 +3,8 @@
 namespace Laelaps\Bundle\FacebookAuthentication;
 
 use Laelaps\Bundle\Facebook\DependencyInjection\FacebookExtension;
-use Laelaps\Bundle\FacebookAuthentication\DependencyInjection\Security\Factory\FacebookFactory;
+use Laelaps\Bundle\FacebookAuthentication\DependencyInjection\Security\Factory\FacebookSecurityFactory;
 use LogicException;
-use SplObserver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -27,7 +26,7 @@ class FacebookAuthenticationBundle extends Bundle
             }
         }
 
-        $securityFactory = new FacebookFactory;
+        $securityFactory = new FacebookSecurityFactory;
         $securityFactory->setFacebookExtension($facebookExtension);
 
         $container->getExtension('facebook_authentication')->attach($securityFactory);

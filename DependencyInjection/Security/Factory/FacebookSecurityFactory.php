@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Mateusz Charytoniuk <mateusz.charytoniuk@gmail.com>
  */
-class FacebookFactory implements SecurityFactoryInterface, SplObserver
+class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
 {
     /**
      * @var string

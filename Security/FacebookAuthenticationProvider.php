@@ -1,6 +1,6 @@
 <?php
 
-namespace Laelaps\Bundle\FacebookAuthentication\Security\Authentication\Provider;
+namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
 use Laelaps\Bundle\FacebookAuthentication\Security\Authentication\Token\WsseUserToken;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
@@ -9,7 +9,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class FacebookProvider implements AuthenticationProviderInterface
+class FacebookAuthenticationProvider implements AuthenticationProviderInterface
 {
     private $userProvider;
     private $cacheDir;

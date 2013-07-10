@@ -1,6 +1,6 @@
 <?php
 
-namespace Laelaps\Bundle\FacebookAuthentication\Security\EntryPoint;
+namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
 use Laelaps\Bundle\FacebookAuthentication\FacebookSymfonyAdapter;
 use Symfony\Component\HttpFoundation\Request;

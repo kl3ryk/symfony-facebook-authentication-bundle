@@ -1,6 +1,6 @@
 <?php
 
-namespace Acme\DemoBundle\Security\Firewall;
+namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Acme\DemoBundle\Security\Authentication\Token\WsseUserToken;
 
-class FacebookListener implements ListenerInterface
+class FacebookFirewallListener implements ListenerInterface
 {
     /**
      * @var \Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface
