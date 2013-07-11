@@ -1,3 +1,7 @@
 services:
+
     session.storage.mock:
         class: Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage
+
+    security.user_provider.testable:
+        class: Laelaps\Bundle\FacebookAuthentication\Tests\Fixture\Security\TestableUserProvider

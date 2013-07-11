@@ -17,7 +17,7 @@ $container->loadFromExtension('security', [
     ],
     'providers' => [
         'facebook' => [
-            'id' => FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_USER_PROVIDER,
+            'id' => 'security.user_provider.testable',
         ]
     ]
 ]);

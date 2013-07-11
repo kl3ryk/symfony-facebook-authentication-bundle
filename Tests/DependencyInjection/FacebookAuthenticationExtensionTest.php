@@ -3,7 +3,7 @@
 namespace Laelaps\Bundle\FacebookAuthentication\Tests\DependencyInjection;
 
 use Laelaps\Bundle\FacebookAuthentication\DependencyInjection\FacebookAuthenticationExtension;
-use Laelaps\Bundle\FacebookAuthentication\Tests\Fixture\TestableSplObserver;
+use Laelaps\PHPUnit\TestAware\Fixture\SplObserver as SplObserverFixture;
 use PHPUnit_Framework_TestCase;
 
 class FacebookAuthenticationExtensionTest extends PHPUnit_Framework_TestCase
@@ -38,11 +38,11 @@ class FacebookAuthenticationExtensionTest extends PHPUnit_Framework_TestCase
     {
         $extension = new FacebookAuthenticationExtension;
 
-        $observer = new TestableSplObserver($this);
+        $observer = new SplObserverFixture($this);
 
         $extension->attach($observer);
 
-        $this->assertFalse($observer->isNotifiedBy($extension));
+        $observer->assertIsNotNotifiedBy($extension);
     }
 
     /**
@@ -52,7 +52,7 @@ class FacebookAuthenticationExtensionTest extends PHPUnit_Framework_TestCase
     {
         $extension = new FacebookAuthenticationExtension;
 
-        $observer = new TestableSplObserver($this);
+        $observer = new SplObserverFixture($this);
 
         $extension->attach($observer);
         $extension->attach($observer);
@@ -63,25 +63,25 @@ class FacebookAuthenticationExtensionTest extends PHPUnit_Framework_TestCase
         $extension = new FacebookAuthenticationExtension;
         $extension->setFacebookApplicationConfiguration([ uniqid() => uniqid() ]);
 
-        $observer = new TestableSplObserver($this);
+        $observer = new SplObserverFixture($this);
 
         $extension->attach($observer);
 
-        $this->assertTrue($observer->isNotifiedBy($extension));
+        $observer->assertIsNotifiedBy($extension);
     }
 
     public function testThatObserverCanBeDetached()
     {
         $extension = new FacebookAuthenticationExtension;
 
-        $observer = new TestableSplObserver($this);
+        $observer = new SplObserverFixture($this);
 
         $extension->attach($observer);
         $extension->detach($observer);
 
         $extension->notify();
 
-        $this->assertFalse($observer->isNotifiedBy($extension));
+        $observer->assertIsNotNotifiedBy($extension);
     }
 
     /**
@@ -91,7 +91,7 @@ class FacebookAuthenticationExtensionTest extends PHPUnit_Framework_TestCase
     {
         $extension = new FacebookAuthenticationExtension;
 
-        $observer = new TestableSplObserver($this);
+        $observer = new SplObserverFixture($this);
 
         $extension->attach($observer);
 

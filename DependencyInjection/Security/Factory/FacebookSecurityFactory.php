@@ -133,10 +133,12 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
      */
     public function create(ContainerBuilder $container, $providerKey, $config, $userProviderId, $defaultEntryPointId)
     {
+        $facebookAdapterId = $this->createFacebookAdapter($container, $providerKey, $config);
+
         return [
-            $this->createAuthenticationProvider($container, $providerKey, $config, $userProviderId),
-            $this->createListener($container, $providerKey, $config, $userProviderId),
-            $this->createEntryPoint($container, $providerKey, $config, $defaultEntryPointId),
+            $this->createAuthenticationProvider($container, $providerKey, $config),
+            $this->createListener($container, $providerKey, $config, $facebookAdapterId),
+            $this->createEntryPoint($container, $providerKey, $config, $defaultEntryPointId, $facebookAdapterId),
         ];
     }
 
@@ -150,6 +152,7 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
     {
         $failureHandlerId = 'security.authentication.failure_handler';
         $failureHandler = new DefinitionDecorator($failureHandlerId);
+
         $failureHandlerId = $this->namespaceServiceId($failureHandlerId, $providerKey);
         $failureHandler = $container->setDefinition($failureHandlerId, $failureHandler);
 
@@ -160,10 +163,9 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      * @param string $providerKey
      * @param array config
-     * @param string $userProviderId
      * @return string
      */
-    public function createAuthenticationProvider(ContainerBuilder $container, $providerKey, array $config, $userProviderId)
+    public function createAuthenticationProvider(ContainerBuilder $container, $providerKey, array $config)
     {
         $authenticationProviderId = FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_AUTHENTICATION_PROVIDER;
         $authenticationProvider = new DefinitionDecorator($authenticationProviderId);
@@ -184,6 +186,7 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
     {
         $successHandlerId = 'security.authentication.success_handler';
         $successHandler = new DefinitionDecorator($successHandlerId);
+
         $successHandlerId = $this->namespaceServiceId($successHandlerId, $providerKey);
         $successHandler = $container->setDefinition($successHandlerId, $successHandler);
 
@@ -194,13 +197,16 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      * @param string $providerKey
      * @param array config
-     * @param string $userProviderId
+     * @param string $defaultEntryPointId
+     * @param string $facebookAdapterId
      * @return string
      */
-    public function createEntryPoint(ContainerBuilder $container, $providerKey, array $config, $userProviderId)
+    public function createEntryPoint(ContainerBuilder $container, $providerKey, array $config, $defaultEntryPointId, $facebookAdapterId)
     {
         $entryPointId = FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_ENTRY_POINT;
         $entryPoint = new DefinitionDecorator($entryPointId);
+        $entryPoint->addMethodCall('setFacebookAdapter', [new Reference($facebookAdapterId)]);
+        $entryPoint->addMethodCall('setFacebookPermissions', [$config[FacebookApplicationConfiguration::CONFIG_NODE_NAME_PERMISSIONS]]);
 
         $entryPointId = $this->namespaceServiceId($entryPointId, $providerKey);
         $container->setDefinition($entryPointId, $entryPoint);
@@ -212,10 +218,9 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      * @param string $providerKey
      * @param array config
-     * @param string $userProviderId
      * @return string
      */
-    public function createFacebookAdapter(ContainerBuilder $container, $providerKey, array $config, $userProviderId)
+    public function createFacebookAdapter(ContainerBuilder $container, $providerKey, array $config)
     {
         if (!isset($config[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS])) {
             $facebookAdapterId = $config[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS];
@@ -232,14 +237,15 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      * @param string $providerKey
      * @param array config
-     * @param string $userProviderId
+     * @param string $facebookAdapterId
      * @return string
      */
-    public function createListener(ContainerBuilder $container, $providerKey, array $config, $userProviderId)
+    public function createListener(ContainerBuilder $container, $providerKey, array $config, $facebookAdapterId)
     {
         $listenerId = FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_FIREWALL_LISTENER;
 
         $listener = new DefinitionDecorator($listenerId);
+        $listener->addMethodCall('setFacebookAdapter', [new Reference($facebookAdapterId)]);
         $listener->addMethodCall('setAuthenticationFailureHandler', [new Reference($this->createAuthenticationFailureHandler($container, $providerKey, $config))]);
         $listener->addMethodCall('setAuthenticationSuccessHandler', [new Reference($this->createAuthenticationSuccessHandler($container, $providerKey, $config))]);
 

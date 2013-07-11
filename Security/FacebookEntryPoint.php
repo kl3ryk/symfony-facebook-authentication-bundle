@@ -2,31 +2,54 @@
 
 namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
+use Laelaps\Bundle\Facebook\FacebookAdapterAwareInterface;
+use Laelaps\Bundle\Facebook\FacebookAdapterAwareTrait;
+use Laelaps\Bundle\FacebookAuthentication\FacebookLoginRedirectResponse;
 use Laelaps\Bundle\FacebookAuthentication\FacebookSymfonyAdapter;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
-class FacebookEntryPoint implements AuthenticationEntryPointInterface
+class FacebookEntryPoint implements AuthenticationEntryPointInterface, FacebookAdapterAwareInterface
 {
-    /**
-     * @var \Laelaps\Bundle\FacebookAuthentication\FacebookSymfonyAdapter
-     */
-    private $facebook;
+    use FacebookAdapterAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * @var array
      */
-    public function start(Request $request, AuthenticationException $authException = null)
+    private $facebookPermissions = [];
+
+    /**
+     * @return array
+     */
+    public function getFacebookPermissions()
     {
-        var_dump(__METHOD__);
+        return $this->facebookPermissions;
     }
 
     /**
-     * @param \Laelaps\Bundle\FacebookAuthentication\FacebookSymfonyAdapter $facebook
+     * @param array $facebookPermissions
+     * @return void
      */
-    public function setFacebook(FacebookSymfonyAdapter $facebook = null)
+    public function setFacebookPermissions($facebookPermissions = [])
     {
-        $this->facebook = $facebook;
+        $this->facebookPermissions = $facebookPermissions;
+    }
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Symfony\Component\Security\Core\Exception\AuthenticationException $authenticationException
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function start(Request $request, AuthenticationException $authenticationException = null)
+    {
+        $redirectUrl = $this->getFacebookAdapter()
+            ->getLoginUrlForRequest($request, [
+                'scope' => $this->getFacebookPermissions(),
+            ])
+        ;
+
+        return new RedirectResponse($redirectUrl);
     }
 }

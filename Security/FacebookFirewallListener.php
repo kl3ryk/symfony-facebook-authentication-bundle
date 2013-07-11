@@ -4,19 +4,30 @@ namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
 use BadMethodCallException;
 use Laelaps\Bundle\Facebook\FacebookAdapter;
+use Laelaps\Bundle\Facebook\FacebookAdapterAwareInterface;
+use Laelaps\Bundle\Facebook\FacebookAdapterAwareTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 
-class FacebookFirewallListener implements ListenerInterface
+class FacebookFirewallListener implements FacebookAdapterAwareInterface, ListenerInterface
 {
+    use FacebookAdapterAwareTrait;
+
     /**
      * @var string
      */
     const SESSION_USER_FACEBOOK_ID = 'user_facebook_id';
+
+    /**
+     * @var \Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface
+     */
+    private $authenticationFailureHandle;
 
     /**
      * @var \Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface
@@ -24,9 +35,9 @@ class FacebookFirewallListener implements ListenerInterface
     private $authenticationManager;
 
     /**
-     * @var \Laelaps\Bundle\Facebook\FacebookAdapter
+     * @var \Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface
      */
-    private $facebookAdapter;
+    private $authenticationSuccessHandle;
 
     /**
      * @var \Symfony\Component\Security\Core\SecurityContextInterface
@@ -44,7 +55,9 @@ class FacebookFirewallListener implements ListenerInterface
         $token = new FacebookUserToken($user);
 
         try {
-            $authToken = $this->authenticationManager->authenticate($token, $facebookAdapter);
+            $authToken = $this->getAuthenticationManager()
+                ->authenticate($token, $facebookAdapter)
+            ;
         } catch (AuthenticationException $failed) {
             $this->securityContext->setToken($token);
 
@@ -57,16 +70,27 @@ class FacebookFirewallListener implements ListenerInterface
     }
 
     /**
-     * @return \Laelaps\Bundle\Facebook\FacebookAdapter
-     * @throws \BadMethodCallException
+     * @return \Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface
      */
-    public function getFacebookAdapter()
+    public function getAuthenticationManager()
     {
-        if (!($this->facebookAdapter instanceof FacebookAdapter)) {
-            throw new BadMethodCallException('FacebookAdapter is not set.');
+        if (!($this->authenticationManager instanceof AuthenticationManagerInterface)) {
+            throw new BadMethodCallException('AuthenticationManager is not set.');
         }
 
-        return $this->facebookAdapter;
+        return $this->authenticationManager;
+    }
+
+    /**
+     * @return \Symfony\Component\Security\Core\SecurityContextInterface
+     */
+    public function getSecurityContext()
+    {
+        if (!($this->securityContext instanceof SecurityContextInterface)) {
+            throw new BadMethodCallException('SecurityContext is not set.');
+        }
+
+        return $this->securityContext;
     }
 
     /**
@@ -83,11 +107,36 @@ class FacebookFirewallListener implements ListenerInterface
     }
 
     /**
-     * @param \Laelaps\Bundle\Facebook\FacebookAdapter $facebook
+     * @param \Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface $authenticationFailureHandler
+     */
+    public function setAuthenticationFailureHandler(AuthenticationFailureHandlerInterface $authenticationFailureHandler)
+    {
+        $this->authenticationFailureHandler = $authenticationFailureHandler;
+    }
+
+    /**
+     * @param \Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface $authenticationManager
      * @return void
      */
-    public function setFacebookAdapter(FacebookAdapter $facebook)
+    public function setAuthenticationManager(AuthenticationManagerInterface $authenticationManager)
     {
-        $this->facebookAdapter = $facebook;
+        $this->authenticationManager = $authenticationManager;
+    }
+
+    /**
+     * @param \Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface $authenticationFailureHandler
+     */
+    public function setAuthenticationSuccessHandler(AuthenticationSuccessHandlerInterface $authenticationSuccessHandler)
+    {
+        $this->authenticationSuccessHandler = $authenticationSuccessHandler;
+    }
+
+    /**
+     * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext
+     * @return void
+     */
+    public function setSecurityContext(SecurityContextInterface $securityContext)
+    {
+        $this->securityContext = $securityContext;
     }
 }

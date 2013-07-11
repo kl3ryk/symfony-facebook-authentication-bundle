@@ -92,9 +92,10 @@ class FacebookFactoryTest extends KernelTestCase
         $container = $this->getContainerBuilder();
         $facebookFactory = $this->getFacebookSecurityFactory();
         $providerKey = uniqid();
-        $userProviderId = uniqid();
+        $defaultEntryPointId = uniqid();
+        $facebookAdapterId = uniqid();
 
-        $serviceId = $facebookFactory->createEntryPoint($container, $providerKey, $config, $userProviderId);
+        $serviceId = $facebookFactory->createEntryPoint($container, $providerKey, $config, $defaultEntryPointId, $facebookAdapterId);
 
         $this->assertTrue($container->has($serviceId));
     }
@@ -105,9 +106,8 @@ class FacebookFactoryTest extends KernelTestCase
         $container = $this->getContainerBuilder();
         $facebookFactory = $this->getFacebookSecurityFactory();
         $providerKey = uniqid();
-        $userProviderId = uniqid();
 
-        $serviceId = $facebookFactory->createFacebookAdapter($container, $providerKey, $config, $userProviderId);
+        $serviceId = $facebookFactory->createFacebookAdapter($container, $providerKey, $config);
 
         $this->assertTrue($container->has($serviceId));
     }
@@ -118,9 +118,9 @@ class FacebookFactoryTest extends KernelTestCase
         $container = $this->getContainerBuilder();
         $facebookFactory = $this->getFacebookSecurityFactory();
         $providerKey = uniqid();
-        $userProviderId = uniqid();
+        $facebookAdapterId = uniqid();
 
-        $serviceId = $facebookFactory->createListener($container, $providerKey, $config, $userProviderId);
+        $serviceId = $facebookFactory->createListener($container, $providerKey, $config, $facebookAdapterId);
 
         $this->assertTrue($container->has($serviceId));
     }
