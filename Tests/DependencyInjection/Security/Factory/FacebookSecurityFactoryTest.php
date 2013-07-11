@@ -9,7 +9,7 @@ use Laelaps\Bundle\FacebookAuthentication\DependencyInjection\Security\Factory\F
 use Laelaps\Bundle\FacebookAuthentication\Tests\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class FacebookFactoryTest extends KernelTestCase
+class FacebookSecurityFactoryTest extends KernelTestCase
 {
     /**
      * @return \Symfony\Component\DependencyInjection\ContainerBuilder
