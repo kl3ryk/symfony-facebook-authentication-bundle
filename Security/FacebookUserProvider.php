@@ -2,6 +2,7 @@
 
 namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
+use FacebookApiException;
 use Laelaps\Bundle\Facebook\FacebookAdapterAwareInterface;
 use Laelaps\Bundle\Facebook\FacebookAdapterAwareTrait;
 use Laelaps\Bundle\FacebookAuthentication\Exception\InvalidUser as InvalidUserException;
@@ -13,11 +14,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 abstract class FacebookUserProvider implements FacebookAdapterAwareInterface, UserProviderInterface
 {
     use FacebookAdapterAwareTrait;
-
-    /**
-     * @var bool
-     */
-    private $shouldCreateUserByDefault = true;
 
     /**
      * @var array
@@ -42,13 +38,28 @@ abstract class FacebookUserProvider implements FacebookAdapterAwareInterface, Us
     abstract public function createUserByFacebookData(array $facebookData);
 
     /**
+     * @return bool
+     */
+    abstract public function shouldCreateUserByDefault();
+
+    /**
      * @param string $username
-     * @return array
+     * @return array|null
      */
     protected function getCurrentUserFacebookData($username)
     {
         if (!isset(self::$cachedFacebookData[$username])) {
-            self::$cachedFacebookData[$username] = $this->getFacebookAdapter()->api('/me');
+            try {
+                self::$cachedFacebookData[$username] = $this->getFacebookAdapter()->api('/me');
+            } catch (FacebookApiException $e) {
+                // $recovery = $this->getFacebookAdapter()->recover($e);
+                // if ($recovery->shouldRetry()) {
+                //     return $this->getCurrentUserFacebookData($username);
+                // }
+
+                // throw $e;
+                return null;
+            }
         }
 
         return self::$cachedFacebookData[$username];
@@ -73,10 +84,13 @@ abstract class FacebookUserProvider implements FacebookAdapterAwareInterface, Us
         }
 
         if ($this->shouldCreateUser($username)) {
-            $this->createUserByFacebookData($this->getCurrentUserFacebookData($username));
-            $this->setShouldCreateUser($username, false);
+            $facebookData = $this->getCurrentUserFacebookData($username);
+            if (is_array($facebookData)) {
+                $this->createUserByFacebookData($facebookData);
+                $this->setShouldCreateUser($username, false);
 
-            return $this->loadUserByUsername($username);
+                return $this->loadUserByUsername($username);
+            }
         }
 
         throw new UsernameNotFoundException(sprintf('Failed to load user by username: "%s"', $username));
@@ -102,12 +116,13 @@ abstract class FacebookUserProvider implements FacebookAdapterAwareInterface, Us
     }
 
     /**
-     * @param bool $shouldCreateUserByDefault
-     * @return void
+     * @param string $username
+     * @param bool $shouldCreate
+     * @return bool
      */
-    public function setShouldCreateUserByDefault($shouldCreateUserByDefault)
+    public function setShouldCreateUser($username, $shouldCreate = true)
     {
-        $this->shouldCreateUserByDefault = (bool) $shouldCreateUserByDefault;
+        $this->usernameShouldCreateStatus[$username] = (bool) $shouldCreate;
     }
 
     /**
