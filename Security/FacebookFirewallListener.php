@@ -45,31 +45,6 @@ class FacebookFirewallListener implements FacebookAdapterAwareInterface, Listene
     private $securityContext;
 
     /**
-     * @param string $user
-     * @param \Laelaps\Bundle\Facebook\FacebookAdapter $facebookAdapter
-     * @return \Laelaps\Bundle\FacebookAuthentication\Security\FacebookUserToken
-     * @throws \Symfony\Component\Security\Core\Exception\AuthenticationException
-     */
-    public function authenticateUser($user, FacebookAdapter $facebookAdapter)
-    {
-        $token = new FacebookUserToken($user);
-
-        try {
-            $authToken = $this->getAuthenticationManager()
-                ->authenticate($token, $facebookAdapter)
-            ;
-        } catch (AuthenticationException $failed) {
-            $this->securityContext->setToken($token);
-
-            throw $failed;
-        }
-
-        $this->securityContext->setToken($authToken);
-
-        return $authToken;
-    }
-
-    /**
      * @return \Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface
      */
     public function getAuthenticationManager()
@@ -101,9 +76,25 @@ class FacebookFirewallListener implements FacebookAdapterAwareInterface, Listene
     {
         $userFacebookId = $this->getFacebookAdapter()->getUser();
 
-        if ($userFacebookId) {
-            $this->authenticateUser($userFacebookId);
+        if (!$userFacebookId) {
+            return;
         }
+
+        $token = new FacebookUserToken($userFacebookId);
+
+        try {
+            $authToken = $this->getAuthenticationManager()
+                ->authenticate($token)
+            ;
+        } catch (AuthenticationException $failed) {
+            $this->securityContext->setToken(null);
+
+            throw $failed;
+        }
+
+        $this->securityContext->setToken($authToken);
+
+        return $authToken;
     }
 
     /**

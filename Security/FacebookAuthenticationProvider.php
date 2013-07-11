@@ -3,10 +3,13 @@
 namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
 use Laelaps\Bundle\Facebook\FacebookAdapter;
+use Laelaps\Bundle\FacebookAuthentication\Exception\InvalidUser as InvalidUserException;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class FacebookAuthenticationProvider implements AuthenticationProviderInterface
@@ -19,38 +22,44 @@ class FacebookAuthenticationProvider implements AuthenticationProviderInterface
     /**
      * @param \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token
      * @return bool
+     * @throws \Laelaps\Bundle\FacebookAuthentication\Exception\InvalidUser
      */
     public function authenticate(TokenInterface $token)
     {
-        $user = $this->userProvider->loadUserByUsername($token->getUsername());
+        $user = $this->getUserProvider()
+            ->loadUserByUsername($token->getUsername())
+        ;
 
-        if (!$user) {
-            return $this->notifyAuthenticationFailure($token);
+        if (!$user || !($user instanceof UserInterface)) {
+            throw new InvalidUserException($user);
         }
 
-        $authenticatedToken = new FacebookUserToken($user, $user->getRoles());
-
-        $this->notifyAuthenticationSuccess($authenticatedToken);
+        $authenticatedToken = new FacebookUserToken($user);
+        $authenticatedToken->setAuthenticated(true);
 
         return $authenticatedToken;
     }
 
     /**
-     * @param \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token
-     * @return bool
-     * @throws \Symfony\Component\Security\Core\Exception\AuthenticationException
+     * @return \Symfony\Component\Security\Core\User\UserProviderInterface $userProvider
+     * @throws \BadMethodCallException
      */
-    public function notifyAuthenticationFailure(TokenInterface $token)
+    public function getUserProvider()
     {
-        throw new AuthenticationException('Facebook authentication failed');
+        if (!($this->userProvider instanceof UserProviderInterface)) {
+            throw new BadMethodCallException('UserProvider is not set.');
+        }
+
+        return $this->userProvider;
     }
 
     /**
-     * @param \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token
-     * @return bool
+     * @param \Symfony\Component\Security\Core\User\UserProviderInterface $userProvider
+     * @return void
      */
-    public function notifyAuthenticationSuccess(TokenInterface $token)
+    public function setUserProvider(UserProviderInterface $userProvider)
     {
+        $this->userProvider = $userProvider;
     }
 
     /**

@@ -20,6 +20,7 @@ class TestableUserProvider implements PHPUnitAwareInterface, UserProviderInterfa
      */
     public function loadUserByUsername($username)
     {
+        var_dump(__METHOD__);
     }
 
     /**
@@ -29,6 +30,7 @@ class TestableUserProvider implements PHPUnitAwareInterface, UserProviderInterfa
      */
     public function refreshUser(UserInterface $user)
     {
+        var_dump(__METHOD__);
     }
 
     /**

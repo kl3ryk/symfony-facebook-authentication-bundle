@@ -5,15 +5,20 @@ namespace Laelaps\Bundle\FacebookAuthentication\Security;
 use BadMethodCallException;
 use InvalidArgumentException;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class FacebookUserToken extends AbstractToken
 {
     /**
      * {@inheritDoc}
      */
-    public function __construct($user, array $roles = [])
+    public function __construct($user, array $roles = null)
     {
-        parent::__construct($roles);
+        if (is_null($roles) && $user instanceof UserInterface) {
+            $roles = $user->getRoles();
+        }
+
+        parent::__construct($roles ?: []);
 
         $this->setUser($user);
     }

@@ -4,7 +4,7 @@ namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
 use Laelaps\Bundle\Facebook\FacebookAdapterAwareInterface;
 use Laelaps\Bundle\Facebook\FacebookAdapterAwareTrait;
-use Laelaps\Bundle\FacebookAuthentication\FacebookLoginRedirectResponse;
+use Laelaps\Bundle\FacebookAuthentication\FacebookLoginUrlRedirectResponse;
 use Laelaps\Bundle\FacebookAuthentication\FacebookSymfonyAdapter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,12 +44,6 @@ class FacebookEntryPoint implements AuthenticationEntryPointInterface, FacebookA
      */
     public function start(Request $request, AuthenticationException $authenticationException = null)
     {
-        $redirectUrl = $this->getFacebookAdapter()
-            ->getLoginUrlForRequest($request, [
-                'scope' => $this->getFacebookPermissions(),
-            ])
-        ;
-
-        return new RedirectResponse($redirectUrl);
+        return new FacebookLoginUrlRedirectResponse($this->getFacebookAdapter(), $this->getFacebookPermissions());
     }
 }

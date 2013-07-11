@@ -6,8 +6,11 @@ use Laelaps\Bundle\FacebookAuthentication\Tests\KernelTestCase;
 
 class FacebookEntryPointTest extends KernelTestCase
 {
-    public function testThat()
+    public function testThatRedirectResponseIsReturnedByDefault()
     {
         $client = $this->getClient();
+        $client->request('GET', '/');
+
+        $this->assertInstanceOf('Laelaps\Bundle\FacebookAuthentication\FacebookLoginUrlRedirectResponse', $client->getResponse());
     }
 }
