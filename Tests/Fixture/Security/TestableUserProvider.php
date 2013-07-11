@@ -5,7 +5,6 @@ namespace Laelaps\Bundle\FacebookAuthentication\Tests\Fixture\Security;
 use Laelaps\PHPUnit\TestAware\PHPUnitAwareInterface;
 use Laelaps\PHPUnit\TestAware\PHPUnitAwareTrait;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 

@@ -5,8 +5,6 @@ namespace Laelaps\Bundle\FacebookAuthentication\Security;
 use Laelaps\Bundle\Facebook\FacebookAdapterAwareInterface;
 use Laelaps\Bundle\Facebook\FacebookAdapterAwareTrait;
 use Laelaps\Bundle\FacebookAuthentication\FacebookLoginUrlRedirectResponse;
-use Laelaps\Bundle\FacebookAuthentication\FacebookSymfonyAdapter;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;

@@ -1,7 +1,6 @@
 <?php
 
 use Laelaps\Bundle\FacebookAuthentication\Configuration\FacebookAuthenticationConfiguration;
-use Laelaps\Bundle\FacebookAuthentication\DependencyInjection\FacebookAuthenticationExtension;
 
 $container->loadFromExtension('security', [
     'firewalls' => [

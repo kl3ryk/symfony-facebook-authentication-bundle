@@ -2,13 +2,9 @@
 
 namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
-use Laelaps\Bundle\Facebook\FacebookAdapter;
 use Laelaps\Bundle\FacebookAuthentication\Exception\InvalidUser as InvalidUserException;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\NonceExpiredException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 

@@ -3,10 +3,8 @@
 namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
 use BadMethodCallException;
-use Laelaps\Bundle\Facebook\FacebookAdapter;
 use Laelaps\Bundle\Facebook\FacebookAdapterAwareInterface;
 use Laelaps\Bundle\Facebook\FacebookAdapterAwareTrait;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;

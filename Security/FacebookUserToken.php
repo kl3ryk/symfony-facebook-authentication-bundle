@@ -2,8 +2,6 @@
 
 namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
-use BadMethodCallException;
-use InvalidArgumentException;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 
