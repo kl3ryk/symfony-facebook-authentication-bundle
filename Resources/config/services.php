@@ -15,6 +15,4 @@ $definition = new Definition('Laelaps\Bundle\FacebookAuthentication\Security\Fac
 $container->setDefinition(FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_ENTRY_POINT, $definition);
 
 $definition = new Definition('Laelaps\Bundle\FacebookAuthentication\Security\FacebookFirewallListener');
-$definition->addMethodCall('setAuthenticationManager', [$authenticationManagerReference]);
-$definition->addMethodCall('setSecurityContext', [$securityContextReference]);
 $container->setDefinition(FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_FIREWALL_LISTENER, $definition);

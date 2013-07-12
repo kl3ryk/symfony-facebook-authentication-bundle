@@ -70,7 +70,7 @@ abstract class FacebookUserProvider implements FacebookAdapterAwareInterface, Us
      * @throws \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      * @throws \Laelaps\Bundle\FacebookAuthentication\Exception\InvalidUser
      */
-    public function loadUserByUsername($username)
+    final public function loadUserByUsername($username)
     {
         $user = $this->doLoadUserByUsername($username);
 

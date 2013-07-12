@@ -247,9 +247,20 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
         $listenerId = FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_FIREWALL_LISTENER;
 
         $listener = new DefinitionDecorator($listenerId);
+        $listener->setArguments([
+            new Reference('security.context'),
+            new Reference('security.authentication.manager'),
+            new Reference('security.authentication.session_strategy'),
+            new Reference('security.http_utils'),
+            $providerKey,
+            new Reference($this->createAuthenticationSuccessHandler($container, $providerKey, $config)),
+            new Reference($this->createAuthenticationFailureHandler($container, $providerKey, $config)),
+            $config,
+            ($container->has('logger') ? new Reference('logger') : null),
+            new Reference('event_dispatcher'),
+        ]);
+
         $listener->addMethodCall('setFacebookAdapter', [new Reference($facebookAdapterId)]);
-        $listener->addMethodCall('setAuthenticationFailureHandler', [new Reference($this->createAuthenticationFailureHandler($container, $providerKey, $config))]);
-        $listener->addMethodCall('setAuthenticationSuccessHandler', [new Reference($this->createAuthenticationSuccessHandler($container, $providerKey, $config))]);
 
         $listenerId = $this->namespaceServiceId($listenerId, $providerKey);
         $container->setDefinition($listenerId, $listener);
