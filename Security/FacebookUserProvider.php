@@ -32,10 +32,11 @@ abstract class FacebookUserProvider implements FacebookAdapterAwareInterface, Us
     abstract protected function doLoadUserByUsername($username);
 
     /**
+     * @param string $username
      * @param array $facebookData
      * @return void
      */
-    abstract public function createUserByFacebookData(array $facebookData);
+    abstract public function createUserByFacebookData($username, array $facebookData);
 
     /**
      * @return bool
@@ -49,17 +50,15 @@ abstract class FacebookUserProvider implements FacebookAdapterAwareInterface, Us
     protected function getCurrentUserFacebookData($username)
     {
         if (!isset(self::$cachedFacebookData[$username])) {
-            try {
-                self::$cachedFacebookData[$username] = $this->getFacebookAdapter()->api('/me');
-            } catch (FacebookApiException $e) {
+            // try {
+            self::$cachedFacebookData[$username] = $this->getFacebookAdapter()->api('/me');
+            // } catch (FacebookApiException $e) {
                 // $recovery = $this->getFacebookAdapter()->recover($e);
                 // if ($recovery->shouldRetry()) {
                 //     return $this->getCurrentUserFacebookData($username);
                 // }
-
                 // throw $e;
-                return null;
-            }
+            // }
         }
 
         return self::$cachedFacebookData[$username];
@@ -86,7 +85,7 @@ abstract class FacebookUserProvider implements FacebookAdapterAwareInterface, Us
         if ($this->shouldCreateUser($username)) {
             $facebookData = $this->getCurrentUserFacebookData($username);
             if (is_array($facebookData)) {
-                $this->createUserByFacebookData($facebookData);
+                $this->createUserByFacebookData($username, $facebookData);
                 $this->setShouldCreateUser($username, false);
 
                 return $this->loadUserByUsername($username);

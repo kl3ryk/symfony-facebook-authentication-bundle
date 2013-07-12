@@ -4,6 +4,7 @@ namespace Laelaps\Bundle\FacebookAuthentication\Tests\Fixture\Security;
 
 use Laelaps\PHPUnit\TestAware\PHPUnitAwareInterface;
 use Laelaps\PHPUnit\TestAware\PHPUnitAwareTrait;
+use OutOfRangeException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -13,13 +14,47 @@ class TestableUserProvider implements PHPUnitAwareInterface, UserProviderInterfa
     use PHPUnitAwareTrait;
 
     /**
+     * @var array
+     */
+    private $users = [];
+
+    /**
      * @param string $username
      * @return \Symfony\Component\Security\Core\User\UserInterface
      * @throws \Symfony\Component\Security\Core\ExceptionUsernameNotFoundException
      */
     public function loadUserByUsername($username)
     {
-        var_dump(__METHOD__);
+        if ($this->hasPredefinedUser($username)) {
+            return $this->getPredefinedUser($username);
+        }
+
+        return $this->getPHPUnit()
+            ->getMock('Symfony\Component\Security\Core\User\UserInterface')
+        ;
+    }
+
+    /**
+     * @param string $username
+     * @return mixed
+     * @throws \OutOfRangeException
+     */
+    public function getPredefinedUser($username)
+    {
+        if (!$this->hasPredefinedUser($username)) {
+            throw new OutOfRangeException(sprintf('User "%s" is not predefined.', $username));
+        }
+
+        return $this->users[$username];
+    }
+
+    /**
+     * @param string $username
+     * @return bool
+     */
+    public function hasPredefinedUser($username)
+    {
+        return array_key_exists($username, $this->users);
     }
 
     /**
@@ -29,7 +64,17 @@ class TestableUserProvider implements PHPUnitAwareInterface, UserProviderInterfa
      */
     public function refreshUser(UserInterface $user)
     {
-        var_dump(__METHOD__);
+        return $this->loadUserByUsername($user->getUsername());
+    }
+
+    /**
+     * @param string $username
+     * @param mixed $user
+     * @return void
+     */
+    public function setPredefinedUser($username, $user)
+    {
+        $this->users[$username] = $user;
     }
 
     /**

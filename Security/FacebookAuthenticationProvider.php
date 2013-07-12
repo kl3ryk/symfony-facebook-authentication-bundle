@@ -2,6 +2,7 @@
 
 namespace Laelaps\Bundle\FacebookAuthentication\Security;
 
+use BadMethodCallException;
 use Laelaps\Bundle\FacebookAuthentication\Exception\InvalidUser as InvalidUserException;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -26,7 +27,7 @@ class FacebookAuthenticationProvider implements AuthenticationProviderInterface
             ->loadUserByUsername($token->getUsername())
         ;
 
-        if (!$user || !($user instanceof UserInterface)) {
+        if (!($user instanceof UserInterface)) {
             throw new InvalidUserException($user);
         }
 
