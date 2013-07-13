@@ -51,7 +51,7 @@ abstract class FacebookUserProvider implements FacebookAdapterAwareInterface, Us
     {
         if (!isset(self::$cachedFacebookData[$username])) {
             // try {
-            self::$cachedFacebookData[$username] = $this->getFacebookAdapter()->api('/me');
+            self::$cachedFacebookData[$username] = $this->getFacebookAdapter()->api('/' . $username);
             // } catch (FacebookApiException $e) {
                 // $recovery = $this->getFacebookAdapter()->recover($e);
                 // if ($recovery->shouldRetry()) {

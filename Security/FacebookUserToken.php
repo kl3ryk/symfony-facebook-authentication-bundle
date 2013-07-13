@@ -1,6 +1,7 @@
 <?php
 
 namespace Laelaps\Bundle\FacebookAuthentication\Security;
+
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 
