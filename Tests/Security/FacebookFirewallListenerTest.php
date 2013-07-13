@@ -4,7 +4,6 @@ namespace Laelaps\Bundle\FacebookAuthentication\Tests\Security;
 
 use Laelaps\Bundle\Facebook\FacebookAdapter\FacebookAdapterMock;
 use Laelaps\Bundle\FacebookAuthentication\Security\FacebookUserToken;
-use Laelaps\Bundle\FacebookAuthentication\Tests\Fixture\Security\TestableUserProvider;
 use Laelaps\Bundle\FacebookAuthentication\Tests\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
