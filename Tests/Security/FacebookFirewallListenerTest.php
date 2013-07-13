@@ -91,12 +91,14 @@ class FacebookFirewallListenerTest extends KernelTestCase
 
         // ...and now some assertions
 
-        $token = $container->get('security.context')->getToken();
+        $securityContext = $container->get('security.context');
+
+        $token = $securityContext->getToken();
         $this->assertNull($token, 'failed asserting that security context has no token before authentication');
 
         $firewallListener->handle($getResponseEvent);
 
-        $token = $container->get('security.context')->getToken();
+        $token = $securityContext->getToken();
 
         $this->assertInstanceof('Laelaps\Bundle\FacebookAuthentication\Security\FacebookUserToken', $token, 'failed asserting that security context token is a Facebook user token');
         $this->assertSame($username, $token->getUsername(), 'failed asserting that security context token username is correct username');
