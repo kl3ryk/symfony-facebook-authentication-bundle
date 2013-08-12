@@ -112,6 +112,35 @@ class FacebookSecurityFactoryTest extends KernelTestCase
         $this->assertTrue($container->has($serviceId));
     }
 
+    public function testThatFacebookAdapterIsCreatedWithAlias()
+    {
+        $config = $this->getFacebookConfiguration();
+        $alias = $config[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS] = uniqid();
+
+        $container = $this->getContainerBuilder();
+        $facebookFactory = $this->getFacebookSecurityFactory();
+        $providerKey = uniqid();
+
+        $serviceId = $facebookFactory->createFacebookAdapter($container, $providerKey, $config);
+
+        $this->assertSame($alias, $serviceId);
+        $this->assertTrue($container->has($serviceId));
+    }
+
+    public function testThatFacebookAdapterIsCreatedWithoutAlias()
+    {
+        $config = $this->getFacebookConfiguration();
+        unset($config[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS]);
+
+        $container = $this->getContainerBuilder();
+        $facebookFactory = $this->getFacebookSecurityFactory();
+        $providerKey = uniqid();
+
+        $serviceId = $facebookFactory->createFacebookAdapter($container, $providerKey, $config);
+
+        $this->assertTrue($container->has($serviceId));
+    }
+
     public function testThatListenerIsCreated()
     {
         $config = $this->getFacebookConfiguration();
