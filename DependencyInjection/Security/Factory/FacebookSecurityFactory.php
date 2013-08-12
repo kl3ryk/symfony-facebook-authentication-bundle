@@ -224,7 +224,7 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
      */
     public function createFacebookAdapter(ContainerBuilder $container, $providerKey, array $config)
     {
-        if (!isset($config[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS])) {
+        if (isset($config[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS])) {
             $facebookAdapterId = $config[FacebookAdapterConfiguration::CONFIG_NODE_NAME_ADAPTER_SERVICE_ALIAS];
         } else {
             $facebookAdapterId = $this->namespaceServiceId('facebook_adapter', $providerKey);
