@@ -51,6 +51,16 @@ class FacebookAuthenticationExtension extends Extension implements FacebookExten
     const CONTAINER_SERVICE_ID_SECURITY_USER_PROVIDER = 'laelaps.security.facebook.user_provider';
 
     /**
+     * @var string
+     */
+    const CONTAINER_SERVICE_ID_SECURITY_FAILURE_HANDLER = 'security.authentication.failure_handler';
+
+    /**
+     * @var string
+     */
+    const CONTAINER_SERVICE_ID_SECURITY_SUCCESS_HANDLER = 'security.authentication.success_handler';
+
+    /**
      * @var array
      */
     private $facebookApplicationConfiguration;

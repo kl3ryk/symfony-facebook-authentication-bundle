@@ -26,6 +26,16 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
     /**
      * @var string
      */
+    const CONFIG_NODE_NAME_AUTHENTICATION_FAILURE_HANDLER = 'failure_handler';
+
+    /**
+     * @var string
+     */
+    const CONFIG_NODE_NAME_AUTHENTICATION_SUCCESS_HANDLER = 'success_handler';
+
+    /**
+     * @var string
+     */
     const FACTORY_KEY = 'facebook';
 
     /**
@@ -120,6 +130,15 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
                 ->booleanNode(FacebookApplicationConfiguration::CONFIG_NODE_NAME_TRUST_PROXY_HEADERS)
                     ->defaultValue($defaults[FacebookApplicationConfiguration::CONFIG_NODE_NAME_TRUST_PROXY_HEADERS])
                 ->end()
+                ->scalarNode(self::CONFIG_NODE_NAME_AUTHENTICATION_FAILURE_HANDLER)
+                    ->cannotBeEmpty()
+                    ->defaultValue(FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_FAILURE_HANDLER)
+                ->end()
+                ->scalarNode(self::CONFIG_NODE_NAME_AUTHENTICATION_SUCCESS_HANDLER)
+                    ->cannotBeEmpty()
+                    ->defaultValue(FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_SUCCESS_HANDLER)
+                ->end()
+
             ->end()
         ;
     }
@@ -150,7 +169,7 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
      */
     public function createAuthenticationFailureHandler(ContainerBuilder $container, $providerKey, array $config)
     {
-        $failureHandlerId = 'security.authentication.failure_handler';
+        $failureHandlerId = $config[self::CONFIG_NODE_NAME_AUTHENTICATION_FAILURE_HANDLER];
         $failureHandler = new DefinitionDecorator($failureHandlerId);
 
         $failureHandlerId = $this->namespaceServiceId($failureHandlerId, $providerKey);
@@ -186,7 +205,7 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
      */
     public function createAuthenticationSuccessHandler(ContainerBuilder $container, $providerKey, array $config)
     {
-        $successHandlerId = 'security.authentication.success_handler';
+        $successHandlerId = $config[self::CONFIG_NODE_NAME_AUTHENTICATION_SUCCESS_HANDLER];
         $successHandler = new DefinitionDecorator($successHandlerId);
 
         $successHandlerId = $this->namespaceServiceId($successHandlerId, $providerKey);
