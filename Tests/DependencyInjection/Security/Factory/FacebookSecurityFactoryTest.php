@@ -34,6 +34,8 @@ class FacebookSecurityFactoryTest extends KernelTestCase
             FacebookApplicationConfiguration::CONFIG_NODE_NAME_PERMISSIONS => [],
             FacebookApplicationConfiguration::CONFIG_NODE_NAME_SECRET => uniqid(),
             FacebookApplicationConfiguration::CONFIG_NODE_NAME_TRUST_PROXY_HEADERS => true,
+            FacebookSecurityFactory::CONFIG_NODE_NAME_AUTHENTICATION_FAILURE_HANDLER => 'failure.handler',
+            FacebookSecurityFactory::CONFIG_NODE_NAME_AUTHENTICATION_SUCCESS_HANDLER => 'success.handler',
         ];
     }
 
