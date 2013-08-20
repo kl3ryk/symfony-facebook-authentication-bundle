@@ -67,6 +67,28 @@ firewalls:
     your_firewall:
         facebook: true
         pattern: /
+        provider: your_user_provider
+```
+
+### Using Custom Authentication handlers
+
+```YAML
+# config.yml
+
+facebook:
+    application_id: "your_application_id"
+    secret: "your_application_secret"
+```
+
+```YAML
+# security.yml
+
+firewalls:
+    your_firewall:
+        facebook:
+            failure_handler: your.authentication.failure_handler
+            success_handler: your.authentication.success_handler
+        pattern: /
 ```
 
 ### Using Several Facebook Applications
