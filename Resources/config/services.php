@@ -4,9 +4,17 @@ use Laelaps\Bundle\FacebookAuthentication\DependencyInjection\FacebookAuthentica
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-$authenticationManagerReference = new Reference('security.authentication.manager');
-$securityContextReference = new Reference('security.context');
-$sessionReference = new Reference('session');
+$httpKernelReference = new Reference('http_kernel');
+$httpUtilsReference = new Reference('security.http_utils');
+
+$definition = new Definition('Laelaps\Bundle\FacebookAuthentication\Security\AuthenticationFailureHandler');
+$definition->addArgument($httpKernelReference);
+$definition->addArgument($httpUtilsReference);
+$container->setDefinition(FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_FAILURE_HANDLER, $definition);
+
+$definition = new Definition('Laelaps\Bundle\FacebookAuthentication\Security\AuthenticationSuccessHandler');
+$definition->addArgument($httpUtilsReference);
+$container->setDefinition(FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_SUCCESS_HANDLER, $definition);
 
 $definition = new Definition('Laelaps\Bundle\FacebookAuthentication\Security\FacebookAuthenticationProvider');
 $container->setDefinition(FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_AUTHENTICATION_PROVIDER, $definition);

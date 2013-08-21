@@ -34,8 +34,8 @@ class FacebookSecurityFactoryTest extends KernelTestCase
             FacebookApplicationConfiguration::CONFIG_NODE_NAME_PERMISSIONS => [],
             FacebookApplicationConfiguration::CONFIG_NODE_NAME_SECRET => uniqid(),
             FacebookApplicationConfiguration::CONFIG_NODE_NAME_TRUST_PROXY_HEADERS => true,
-            FacebookSecurityFactory::CONFIG_NODE_NAME_AUTHENTICATION_FAILURE_HANDLER => 'failure.handler',
-            FacebookSecurityFactory::CONFIG_NODE_NAME_AUTHENTICATION_SUCCESS_HANDLER => 'success.handler',
+            FacebookSecurityFactory::CONFIG_NODE_NAME_AUTHENTICATION_FAILURE_HANDLER => uniqid(),
+            FacebookSecurityFactory::CONFIG_NODE_NAME_AUTHENTICATION_SUCCESS_HANDLER => uniqid(),
         ];
     }
 
@@ -51,18 +51,6 @@ class FacebookSecurityFactoryTest extends KernelTestCase
         return $facebookFactory;
     }
 
-    public function testThatAuthenticationFailureHandlerIsCreated()
-    {
-        $config = $this->getFacebookConfiguration();
-        $container = $this->getContainerBuilder();
-        $facebookFactory = $this->getFacebookSecurityFactory();
-        $providerKey = uniqid();
-
-        $serviceId = $facebookFactory->createAuthenticationFailureHandler($container, $providerKey, $config);
-
-        $this->assertTrue($container->has($serviceId));
-    }
-
     public function testThatAuthenticationProviderIsCreated()
     {
         $config = $this->getFacebookConfiguration();
@@ -72,18 +60,6 @@ class FacebookSecurityFactoryTest extends KernelTestCase
         $userProviderId = uniqid();
 
         $serviceId = $facebookFactory->createAuthenticationProvider($container, $providerKey, $config, $userProviderId);
-
-        $this->assertTrue($container->has($serviceId));
-    }
-
-    public function testThatAuthenticationSuccessHandlerIsCreated()
-    {
-        $config = $this->getFacebookConfiguration();
-        $container = $this->getContainerBuilder();
-        $facebookFactory = $this->getFacebookSecurityFactory();
-        $providerKey = uniqid();
-
-        $serviceId = $facebookFactory->createAuthenticationSuccessHandler($container, $providerKey, $config);
 
         $this->assertTrue($container->has($serviceId));
     }

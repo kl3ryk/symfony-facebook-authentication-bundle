@@ -138,7 +138,6 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
                     ->cannotBeEmpty()
                     ->defaultValue(FacebookAuthenticationExtension::CONTAINER_SERVICE_ID_SECURITY_SUCCESS_HANDLER)
                 ->end()
-
             ->end()
         ;
     }
@@ -165,23 +164,6 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      * @param string $providerKey
      * @param array config
-     * @return string
-     */
-    public function createAuthenticationFailureHandler(ContainerBuilder $container, $providerKey, array $config)
-    {
-        $failureHandlerId = $config[self::CONFIG_NODE_NAME_AUTHENTICATION_FAILURE_HANDLER];
-        $failureHandler = new DefinitionDecorator($failureHandlerId);
-
-        $failureHandlerId = $this->namespaceServiceId($failureHandlerId, $providerKey);
-        $failureHandler = $container->setDefinition($failureHandlerId, $failureHandler);
-
-        return $failureHandlerId;
-    }
-
-    /**
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @param string $providerKey
-     * @param array config
      * @param string $userProviderId
      * @return string
      */
@@ -195,23 +177,6 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
         $container->setDefinition($authenticationProviderId, $authenticationProvider);
 
         return $authenticationProviderId;
-    }
-
-    /**
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-     * @param string $providerKey
-     * @param array config
-     * @return string
-     */
-    public function createAuthenticationSuccessHandler(ContainerBuilder $container, $providerKey, array $config)
-    {
-        $successHandlerId = $config[self::CONFIG_NODE_NAME_AUTHENTICATION_SUCCESS_HANDLER];
-        $successHandler = new DefinitionDecorator($successHandlerId);
-
-        $successHandlerId = $this->namespaceServiceId($successHandlerId, $providerKey);
-        $successHandler = $container->setDefinition($successHandlerId, $successHandler);
-
-        return $successHandlerId;
     }
 
     /**
@@ -272,8 +237,8 @@ class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
             new Reference('security.authentication.session_strategy'),
             new Reference('security.http_utils'),
             $providerKey,
-            new Reference($this->createAuthenticationSuccessHandler($container, $providerKey, $config)),
-            new Reference($this->createAuthenticationFailureHandler($container, $providerKey, $config)),
+            new Reference($config[self::CONFIG_NODE_NAME_AUTHENTICATION_SUCCESS_HANDLER]),
+            new Reference($config[self::CONFIG_NODE_NAME_AUTHENTICATION_FAILURE_HANDLER]),
             $config,
             ($container->has('logger') ? new Reference('logger') : null),
             new Reference('event_dispatcher'),

@@ -53,12 +53,12 @@ class FacebookAuthenticationExtension extends Extension implements FacebookExten
     /**
      * @var string
      */
-    const CONTAINER_SERVICE_ID_SECURITY_FAILURE_HANDLER = 'security.authentication.failure_handler';
+    const CONTAINER_SERVICE_ID_SECURITY_FAILURE_HANDLER = 'laelaps.security.facebook.failure_handler';
 
     /**
      * @var string
      */
-    const CONTAINER_SERVICE_ID_SECURITY_SUCCESS_HANDLER = 'security.authentication.success_handler';
+    const CONTAINER_SERVICE_ID_SECURITY_SUCCESS_HANDLER = 'laelaps.security.facebook.success_handler';
 
     /**
      * @var array
