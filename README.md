@@ -1,4 +1,4 @@
-# Symfony Facebook Authentication Bundle
+# Symfony Facebook Authentication Bundle [![Build Status](https://travis-ci.org/kl3ryk/symfony-facebook-authentication-bundle.png?branch=1.x)](https://travis-ci.org/kl3ryk/symfony-facebook-authentication-bundle)
 
 This bundle provides **ready to use** Facebook Authentication solution.
 
