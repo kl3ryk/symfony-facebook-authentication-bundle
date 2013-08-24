@@ -20,6 +20,7 @@ use UnderflowException;
  * Facebook container extension.
  *
  * @author Mateusz Charytoniuk <mateusz.charytoniuk@gmail.com>
+ * @author Paweł Łaskarzewski <kl3ryk@gmail.com>
  */
 class FacebookAuthenticationExtension extends Extension implements FacebookExtensionInterface, SplSubject
 {

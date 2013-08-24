@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * Facebook security authentication listener.
  *
  * @author Mateusz Charytoniuk <mateusz.charytoniuk@gmail.com>
+ * @author Paweł Łaskarzewski <kl3ryk@gmail.com>
  */
 class FacebookSecurityFactory implements SecurityFactoryInterface, SplObserver
 {
